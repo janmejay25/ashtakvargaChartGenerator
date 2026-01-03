@@ -21,26 +21,60 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        
+/* Sticky Primary Navbar for About Page */
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* High z-index to stay above profile cards */
+    width: 100%;
+}
+
+/* Smooth scrolling when clicking links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Optional: Add a subtle shadow when scrolling starts */
+nav.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800 ">
 
-    <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-[1000]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-xl font-bold">JSK</span>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-600">Home</a>
-                        <a href="documentation.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-600">Documentation</a>
-                        <a href="about.html" class="px-3 py-2 rounded-md text-sm font-medium bg-indigo-800">About Us</a>
-                    </div>
+     <nav class="bg-indigo-700 text-white shadow-lg mb-6 sticky top-0 z-[1000] w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <span class="text-xl font-bold tracking-tight">JSK</span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-600">Home</a>
+                    <a href="documentation.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-600 transition">Documentation</a>
+                    <a href="about.html" class="px-3 py-2 rounded-md text-sm font-medium bg-indigo-800 transition">About Us</a>
                 </div>
             </div>
+            <div class="md:hidden flex">
+                <button type="button" onclick="toggleMobileMenu()" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-indigo-600 focus:outline-none">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
         </div>
-    </nav>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-indigo-800 px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium bg-indigo-900">Home</a>
+        <a href="documentation.html" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600">Documentation</a>
+        <a href="about.html" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-indigo-600">About Us</a>
+    </div>
+</nav>
+    <!-- navbarends -->
 
     <main class="max-w-4xl mx-auto py-12 px-6">
         <div class="profile-card rounded-3xl shadow-2xl overflow-hidden border border-white">
@@ -116,6 +150,11 @@
     <footer class="text-center py-8 text-slate-400 text-sm">
         <p>&copy; 2026 JSK. Built with precision and care.</p>
     </footer>
-
+<script>
+     function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
+</script>
 </body>
 </html>
