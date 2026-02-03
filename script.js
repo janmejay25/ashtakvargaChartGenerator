@@ -771,56 +771,68 @@ document.getElementById('generate-chart-btn').addEventListener('click', () => {
             return { allSccData, totalsRow, grandTotals };
         }
 
-         function drawKundliForPDF(containerId, planetPositions) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = `<div class="kundli-chart"></div>`;
-            const chartDiv = container.querySelector('.kundli-chart');
-            const lagnaRashi = planetPositions.lagna;
-            const rashiToHouseMap = {};
-            for (let house = 1; house <= 12; house++) {
-                rashiToHouseMap[((lagnaRashi - 1 + house - 1) % 12) + 1] = house;
-            }
-            const planetsInHouse = Array.from({ length: 13 }, () => []);
-            planetsInHouse[1].push(PLANET_MAP.lagna);
-            for (const planet in planetPositions) {
-                if (planet !== 'lagna') {
-                    const targetHouse = rashiToHouseMap[planetPositions[planet]];
-                    if (targetHouse) planetsInHouse[targetHouse].push(PLANET_MAP[planet]);
-                }
-            }
-            let svgHTML = `<svg width="100%" height="100%" viewBox="0 0 440 440">
-                <line x1="0" y1="0" x2="440" y2="440" class="kundli-lines" /><line x1="220" y1="0" x2="0" y2="220" class="kundli-lines" /><line x1="440" y1="220" x2="220" y2="0" class="kundli-lines" /><line x1="0" y1="220" x2="220" y2="440" class="kundli-lines" /><line x1="220" y1="440" x2="440" y2="220" class="kundli-lines" /><line x1="440" y1="0" x2="0" y2="440" class="kundli-lines" />`;
-            const housePos = [ {x:220,y:110}, {x:110,y:22}, {x:44,y:88}, {x:132,y:198}, {x:31,y:286}, {x:110,y:361}, {x:220,y:286}, {x:330,y:383}, {x:418,y:286}, {x:308,y:198}, {x:396,y:88}, {x:330,y:22} ];
-            const rashiPos = [ {x:220,y:66}, {x:154,y:44}, {x:44,y:66}, {x:66,y:220}, {x:44,y:374}, {x:154,y:396}, {x:220,y:374}, {x:286,y:396}, {x:396,y:374}, {x:374,y:220}, {x:396,y:66}, {x:286,y:44} ];
-            
-            for (let house = 1; house <= 12; house++) {
-                const rashiInHouse = ((lagnaRashi - 1 + house - 1) % 12) + 1;
-                svgHTML += `<text x="${rashiPos[house - 1].x}" y="${rashiPos[house - 1].y}" class="rashi" text-anchor="middle">${rashiInHouse}</text>`;
-                
-                const planets = planetsInHouse[house];
-                if (planets.length > 0) {
-                    const x = housePos[house - 1].x;
-                    let y = housePos[house - 1].y;
-                    
-                    // Create lines of 2 planets each
-                    const lines = [];
-                    for (let i = 0; i < planets.length; i += 2) {
-                        lines.push(planets.slice(i, i + 2).join(' '));
-                    }
-
-                    // Adjust starting Y position to center the block of text
-                    const yOffset = (lines.length - 1) * 15 / 2;
-                    y -= yOffset;
-
-                    lines.forEach((lineText, index) => {
-                        const currentY = y + (index * 28); // 28 is the line height
-                        svgHTML += `<text x="${x}" y="${currentY}" class="house-text" text-anchor="middle" dominant-baseline="middle">${lineText}</text>`;
-                    });
-                }
-            }
-            svgHTML += `</svg>`;
-            chartDiv.innerHTML = svgHTML;
+         function drawKundliForPDF(containerId, planetPositions, grandTotals) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = `<div class="kundli-chart"></div>`;
+    const chartDiv = container.querySelector('.kundli-chart');
+    const lagnaRashi = planetPositions.lagna;
+    const rashiToHouseMap = {};
+    for (let house = 1; house <= 12; house++) {
+        rashiToHouseMap[((lagnaRashi - 1 + house - 1) % 12) + 1] = house;
+    }
+    const planetsInHouse = Array.from({ length: 13 }, () => []);
+    planetsInHouse[1].push(PLANET_MAP.lagna);
+    for (const planet in planetPositions) {
+        if (planet !== 'lagna') {
+            const targetHouse = rashiToHouseMap[planetPositions[planet]];
+            if (targetHouse) planetsInHouse[targetHouse].push(PLANET_MAP[planet]);
         }
+    }
+
+    let svgHTML = `<svg width="100%" height="100%" viewBox="0 0 440 440">
+        <line x1="0" y1="0" x2="440" y2="440" class="kundli-lines" />
+        <line x1="220" y1="0" x2="0" y2="220" class="kundli-lines" />
+        <line x1="440" y1="220" x2="220" y2="0" class="kundli-lines" />
+        <line x1="0" y1="220" x2="220" y2="440" class="kundli-lines" />
+        <line x1="220" y1="440" x2="440" y2="220" class="kundli-lines" />
+        <line x1="440" y1="0" x2="0" y2="440" class="kundli-lines" />`;
+
+    // Positions for Planets, Rashis, and the new Ashtakavarga Circles
+    const housePos = [ {x:220,y:110}, {x:110,y:22}, {x:44,y:88}, {x:132,y:198}, {x:31,y:286}, {x:110,y:361}, {x:220,y:286}, {x:330,y:383}, {x:418,y:286}, {x:308,y:198}, {x:396,y:88}, {x:330,y:22} ];
+    const rashiPos = [ {x:220,y:66}, {x:154,y:44}, {x:44,y:66}, {x:66,y:220}, {x:44,y:374}, {x:154,y:396}, {x:220,y:374}, {x:286,y:396}, {x:396,y:374}, {x:374,y:220}, {x:396,y:66}, {x:286,y:44} ];
+    // New positions for the Ashtakavarga numbers (slightly offset from rashi)
+    const ashtakPos = [ {x:220,y:155}, {x:80,y:45}, {x:45,y:130}, {x:160,y:220}, {x:45,y:310}, {x:80,y:395}, {x:220,y:330}, {x:360,y:395}, {x:395,y:310}, {x:280,y:220}, {x:395,y:130}, {x:360,y:45} ];
+    
+    for (let house = 1; house <= 12; house++) {
+        const rashiInHouse = ((lagnaRashi - 1 + house - 1) % 12) + 1;
+        svgHTML += `<text x="${rashiPos[house - 1].x}" y="${rashiPos[house - 1].y}" class="rashi" text-anchor="middle">${rashiInHouse}</text>`;
+        
+        // --- ADDED: Ashtakavarga Number ---
+        if (grandTotals && grandTotals[house - 1] !== undefined) {
+            svgHTML += `<circle cx="${ashtakPos[house - 1].x}" cy="${ashtakPos[house - 1].y}" r="14" fill="#f3f4f6" stroke="#374151" stroke-width="1" />`;
+            svgHTML += `<text x="${ashtakPos[house - 1].x}" y="${ashtakPos[house - 1].y}" font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="central" fill="#111827">${grandTotals[house - 1]}</text>`;
+        }
+
+        const planets = planetsInHouse[house];
+        if (planets.length > 0) {
+            const x = housePos[house - 1].x;
+            let y = housePos[house - 1].y;
+            const lines = [];
+            for (let i = 0; i < planets.length; i += 2) {
+                lines.push(planets.slice(i, i + 2).join(' '));
+            }
+            const yOffset = (lines.length - 1) * 15 / 2;
+            y -= yOffset;
+
+            lines.forEach((lineText, index) => {
+                const currentY = y + (index * 28);
+                svgHTML += `<text x="${x}" y="${currentY}" class="house-text" text-anchor="middle" dominant-baseline="middle">${lineText}</text>`;
+            });
+        }
+    }
+    svgHTML += `</svg>`;
+    chartDiv.innerHTML = svgHTML;
+}
 
         function drawSccSummaryKundliForPDF(containerId, grandTotals, lagna) {
             const container = document.getElementById(containerId);
@@ -1109,7 +1121,7 @@ document.getElementById('generate-chart-btn').addEventListener('click', () => {
 
                 const chartData = calculateAllChartData(planetPositions);
                 
-                drawKundliForPDF('pdf-birth-chart', planetPositions);
+                drawKundliForPDF('pdf-birth-chart', planetPositions, chartData.grandTotals);
                 // drawSccSummaryKundliForPDF('pdf-summary-chart', chartData.grandTotals, planetPositions.lagna);
                 drawCircularChakraForPDF('pdf-scc-circular', planetPositions, chartData);
 
